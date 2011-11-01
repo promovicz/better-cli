@@ -1,10 +1,13 @@
 package com.ballew.tools.cli.api;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
+
+import jline.ConsoleReader;
+import jline.SimpleCompletor;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
@@ -39,10 +42,10 @@ public abstract class CommandLineApplication<T extends CLIContext> {
 	private CommandLineArguments _startupArgs;
 	
 	/** The map of command names to commands. **/
-	private Map<String, Command<? extends CLIContext>> _commands;
+	protected Map<String, Command<? extends CLIContext>> _commands;
 	
 	/** The application context. **/
-	private CLIContext _appContext;
+	protected CLIContext _appContext;
 	
 	/**
 	 * Initialize the application. This loads the known commands.
@@ -59,36 +62,46 @@ public abstract class CommandLineApplication<T extends CLIContext> {
 	 * Start the application. This will continuously loop until
 	 * the user exits the application.
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void start() {
 		setDefaultLogLevel();
 		
-		Scanner scan = new Scanner(System.in);
-		while (true) {
-			Console.prompt();
-			String nextLine = scan.nextLine();
-			String[] rawArgs = nextLine.split("\\s");
-			if (rawArgs.length == 0) {
-				continue;
+		try {
+			ConsoleReader reader = new ConsoleReader();
+			reader.addCompletor(new SimpleCompletor(this.getCommands().toArray(new String[0])));
+			while (true) {
+				String nextLine = reader.readLine(">");
+				processInputLine(nextLine);
 			}
-			String commandName = rawArgs[0];
-			Command command = _commands.get(commandName.toLowerCase());
-			if (command == null) {
-				Console.error("Command not recognized: " + commandName);
-				continue;
-			}
-			
-			CommandLineArguments clArgs = new CommandLineArguments(StringUtils.stripArgs(rawArgs, 1));
-			CommandResult result = command.execute((T)_appContext, clArgs);
-			if (result.getStatusCode() != 0) {
-				Console.error("Command returned type ["+
-						result.getType().name()+"] with status code ["+result.getStatusCode()+"].");
-			}
-			
-			if (result.getType() == CommandResultType.EXIT) {
-				this.shutdown();
-				System.exit(0);
-			}
+		}
+		catch (IOException e) {
+			System.err.println("Error reading from input.");
+			e.printStackTrace();
+		}
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	protected void processInputLine(String inputLine) {
+		String[] rawArgs = inputLine.split("\\s");
+		if (rawArgs.length == 0) {
+			return;
+		}
+		String commandName = rawArgs[0];
+		Command command = _commands.get(commandName.toLowerCase());
+		if (command == null) {
+			Console.error("Command not recognized: " + commandName);
+			return;
+		}
+		
+		CommandLineArguments clArgs = new CommandLineArguments(StringUtils.stripArgs(rawArgs, 1));
+		CommandResult result = command.execute(_appContext, clArgs);
+		if (result.getStatusCode() != 0) {
+			Console.error("Command returned type ["+
+					result.getType().name()+"] with status code ["+result.getStatusCode()+"].");
+		}
+		
+		if (result.getType() == CommandResultType.EXIT) {
+			this.shutdown();
+			System.exit(0);
 		}
 	}
 	

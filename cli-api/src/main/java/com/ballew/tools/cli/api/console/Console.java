@@ -15,7 +15,7 @@ public class Console {
 	private static ConsoleLevel _level = ConsoleLevel.INFO;
 	
 	/** Whether or not to prefix each output message with the log level. **/
-	private static boolean _printLogLevel = true;
+	private static boolean _printLogLevel = false;
 	
 	/**
 	 * Set whether or not to print the log level before each message.
@@ -31,13 +31,6 @@ public class Console {
 	 */
 	public static void setLevel(ConsoleLevel level) {
 		_level = level;
-	}
-	
-	/**
-	 * Send a prompt to System.out.
-	 */
-	public static void prompt() {
-		System.out.print("> ");
 	}
 	
 	/**
