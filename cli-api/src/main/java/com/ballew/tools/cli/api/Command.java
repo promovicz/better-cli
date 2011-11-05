@@ -1,13 +1,25 @@
 package com.ballew.tools.cli.api;
 
-import com.ballew.tools.cli.api.CommandResult.CommandResultType;
+import com.ballew.tools.cli.api.annotations.CLICommand;
 import com.ballew.tools.cli.api.console.Console;
+import com.beust.jcommander.JCommander;
 
 /**
  * The Command interface contains a command name, which is matched against the
  * user's input, and it contains a method for command execution.
  * After implementing from this interface, the implementing class should
  * use the @CLICommand annotation to mark it as eligible for use by the API.
+ * 
+ * Note that these command instances should be as light weight as possible, as
+ * they are re-created every time the command is invoked. This also means that you should
+ * not rely on the state of a Command, such as field members of the command. The next time the
+ * command is run, all fields will be reset. If you want to persist something like this,
+ * you should use the CLIContext.
+ * 
+ * To specify command parameters, you should annotate the fields of the command implementation. The annotations
+ * should be @Parameter, defined by JCommander. More info is at <a href="http://jcommander.org/">http://jcommander.org/</a>
+ * and at <a href="http://code.google.com/p/java-cli-api/wiki/SpecifyingCommandParameters">http://code.google.com/p/java-cli-api/wiki/SpecifyingCommandParameters</a>.
+ * 
  * @author Sean
  *
  */
@@ -20,18 +32,28 @@ public abstract class Command<T extends CLIContext> {
 	 * @param args The command line arguments.
 	 * @return The result of the execution of this command.
 	 */
-	public CommandResult execute(T context, CommandLineArguments args) {
+	public CommandResult execute(T context) {
 		try {
-			return innerExecute(context, args);
+			return innerExecute(context);
 		}
-		catch (CommandLineArgMissingException e) {
+		catch (Exception e) {
 			Console.error(e.getMessage());
-			return new CommandResult(CommandResultType.BAD_ARGS, 1);
+			return CommandResult.ERROR;
 		}
-		catch (CommandLineArgInvalidException e) {
-			Console.error(e.getMessage());
-			return new CommandResult(CommandResultType.BAD_ARGS, 1);
+	}
+	
+	/**
+	 * Print the usage for the command.
+	 * By default, this prints the description and available parameters.
+	 */
+	public void usage() {
+		CLICommand commandAnnotation = this.getClass().getAnnotation(CLICommand.class);
+		Console.info("Help for ["+commandAnnotation.name()+"].");
+		String description = commandAnnotation.description();
+		if (description != null && !description.isEmpty()) {
+			Console.info("Description: " + description);
 		}
+		new JCommander(this).usage();
 	}
 	
 	/**
@@ -40,12 +62,5 @@ public abstract class Command<T extends CLIContext> {
 	 * @param args The command line arguments.
 	 * @return The command result.
 	 */
-	protected abstract CommandResult innerExecute(T context, CommandLineArguments args);
-	
-	/*
-	 * TODO: Eventually, this signature will be implemented. It will be used by the default "help" command
-	 * to print usage for specific commands.
-	 * Signature:
-	 * public HelpText getHelpText();
-	 */
+	protected abstract CommandResult innerExecute(T context);
 }

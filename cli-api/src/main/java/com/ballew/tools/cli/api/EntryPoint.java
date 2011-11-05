@@ -66,12 +66,11 @@ public class EntryPoint {
 				System.exit(1);
 			}
 			
-			Constructor<?> constructor = cliEntryClass.getConstructor(CommandLineArguments.class);
+			Constructor<?> constructor = cliEntryClass.getConstructor();
 			
 			@SuppressWarnings("unchecked")
 			CommandLineApplication<? extends CLIContext> cla =
-					(CommandLineApplication<? extends CLIContext>)constructor.newInstance(
-					new CommandLineArguments(StringUtils.stripArgs(args, 1)));
+					(CommandLineApplication<? extends CLIContext>)constructor.newInstance();
 			cla.start();
 		}
 		catch (ClassNotFoundException e) {

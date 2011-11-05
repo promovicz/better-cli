@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 
 import jline.ConsoleReader;
@@ -18,6 +19,9 @@ import com.ballew.tools.cli.api.annotations.CLICommand;
 import com.ballew.tools.cli.api.console.Console;
 import com.ballew.tools.cli.api.console.Console.ConsoleLevel;
 import com.ballew.tools.cli.api.exceptions.CLIInitException;
+import com.ballew.tools.cli.api.exceptions.CommandInitException;
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
 
 /**
  * The CommandLineApplication is the base class for any application wanting
@@ -38,24 +42,25 @@ public abstract class CommandLineApplication<T extends CLIContext> {
 	/** The property key to define whether or not to print log levels. **/
 	private static final String PRINT_LOG_LEVEL_KEY = "print_log_levels";
 	
-	/** The command line arguments given during initial startup. **/
-	private CommandLineArguments _startupArgs;
-	
-	/** The map of command names to commands. **/
-	protected Map<String, Command<? extends CLIContext>> _commands;
+	/** The map of command names to command classes. **/
+	protected Map<String, Class<? extends Command<? extends CLIContext>>> _commands;
 	
 	/** The application context. **/
 	protected CLIContext _appContext;
+	
+	/** The CommandLineParser instance. **/
+	private CommandLineParser _clParser;
+	
 	
 	/**
 	 * Initialize the application. This loads the known commands.
 	 * @param startupArgs The startup args.
 	 * @throws CLIInitException Thrown when commands fail to properly load.
 	 */
-	public CommandLineApplication(CommandLineArguments startupArgs) throws CLIInitException {
-		_startupArgs = startupArgs;
+	public CommandLineApplication() throws CLIInitException {
 		_commands = loadCommands();
 		_appContext = createContext();
+		_clParser = new CommandLineParserImpl();
 	}
 	
 	/**
@@ -65,35 +70,95 @@ public abstract class CommandLineApplication<T extends CLIContext> {
 	public void start() {
 		setDefaultLogLevel();
 		
-		try {
-			ConsoleReader reader = new ConsoleReader();
-			reader.addCompletor(new SimpleCompletor(this.getCommands().toArray(new String[0])));
+		/*
+		 * JLine doesn't run in Eclipse. To get around this, we allow
+		 * a property "jlineDisable" to be specified via VM arguments.
+		 * This causes it to use standard scanning of System.in and disables
+		 * auto complete functionality.
+		 */
+		if (Boolean.getBoolean("jlineDisable")) {
+			Scanner scan = new Scanner(System.in);
 			while (true) {
-				String nextLine = reader.readLine(">");
+				System.out.print(">");
+				String nextLine = scan.nextLine();
 				processInputLine(nextLine);
 			}
 		}
-		catch (IOException e) {
-			System.err.println("Error reading from input.");
-			e.printStackTrace();
+		else {
+			try {
+				ConsoleReader reader = new ConsoleReader();
+				reader.setBellEnabled(_appContext.getBoolean("cliapi.bellenabled", false));
+				reader.addCompletor(new SimpleCompletor(this.getCommandNames().toArray(new String[0])));
+				while (true) {
+					String nextLine = reader.readLine(">");
+					processInputLine(nextLine);
+				}
+			}
+			catch (IOException e) {
+				System.err.println("Error reading from input.");
+				e.printStackTrace();
+			}
 		}
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected void processInputLine(String inputLine) {
-		String[] rawArgs = inputLine.split("\\s");
+		String[] rawArgs = _clParser.parse(inputLine);
 		if (rawArgs.length == 0) {
 			return;
 		}
 		String commandName = rawArgs[0];
-		Command command = _commands.get(commandName.toLowerCase());
+		Command command = null;
+		try {
+			command = findAndCreateCommand(commandName.toLowerCase());
+		}
+		catch (CommandInitException e) {
+			Console.error("Unable to init command ["+e.getCommandName()+"].");
+			return;
+		}
+		
 		if (command == null) {
 			Console.error("Command not recognized: " + commandName);
 			return;
 		}
 		
-		CommandLineArguments clArgs = new CommandLineArguments(StringUtils.stripArgs(rawArgs, 1));
-		CommandResult result = command.execute(_appContext, clArgs);
+		/*
+		 * I wanted to avoid a special case here in CommandLineApplication...
+		 * But here it is anyway. If the user typed a command name followed
+		 * by "--help", then the command usage is printed.
+		 */
+		if (rawArgs.length == 2 && rawArgs[1].equalsIgnoreCase("--help")) {
+			command.usage();
+			return;
+		}
+		
+		// Hand our command to JCommander to be parsed.
+		JCommander commander = new JCommander(command);
+		try {
+			commander.parse(StringUtils.stripArgs(rawArgs, 1));
+		}
+		catch (ParameterException e) {
+			Console.error("Arguments cannot be parsed: " + e.getMessage());
+			return;
+		}
+		catch (ArrayIndexOutOfBoundsException e) {
+			/*
+			 * NOTE: Currently, JCommander throws an ArrayIndexOutOfBoundsException if I pass
+			 * in a valid option, but I do not specify a value. For example:
+			 * loglevel -l
+			 * For now, we'll just catch this and print the following message.
+			 */
+			Console.error("Error parsing arguments: Did you specify a value after providing an option?");
+			return;
+		}
+		catch (Exception e) {
+			// Catch any funny business.
+			Console.error("Unknown error while parsing arguments: " + e.getMessage());
+			return;
+		}
+		
+		CommandResult result = command.execute(_appContext);
+		
 		if (result.getStatusCode() != 0) {
 			Console.error("Command returned type ["+
 					result.getType().name()+"] with status code ["+result.getStatusCode()+"].");
@@ -102,6 +167,25 @@ public abstract class CommandLineApplication<T extends CLIContext> {
 		if (result.getType() == CommandResultType.EXIT) {
 			this.shutdown();
 			System.exit(0);
+		}
+	}
+	
+	/**
+	 * Find and create the command instance.
+	 * @param commandName The command name.
+	 * @return The command, or null if the command name is not recognized.
+	 * @throws CommandInitException Thrown when the command is recognized but failed to load.
+	 */
+	protected Command<? extends CLIContext> findAndCreateCommand(String commandName) throws CommandInitException {
+		Class<? extends Command<? extends CLIContext>> commandClass = _commands.get(commandName);
+		if (commandClass == null) {
+			return null;
+		}
+		try {
+			return (Command<? extends CLIContext>)commandClass.newInstance();
+		}
+		catch (Exception e) {
+			throw new CommandInitException(commandName);
 		}
 	}
 	
@@ -122,40 +206,34 @@ public abstract class CommandLineApplication<T extends CLIContext> {
 	}
 	
 	/**
-	 * Get the startup args specified during the initial application startup.
-	 * @return The startup args specified during the initial application startup.
-	 */
-	protected CommandLineArguments getStartupArgs() {
-		return _startupArgs;
-	}
-	
-	/**
 	 * Load the necessary commands for this application.
 	 * @return The map of commands.
 	 * @throws CLIInitException Thrown when commands fail to properly load.
 	 */
-	private Map<String, Command<? extends CLIContext>> loadCommands() throws CLIInitException{
-		Map<String, Command<? extends CLIContext>> commands = new HashMap<String, Command<? extends CLIContext>>();
+	private Map<String, Class<? extends Command<? extends CLIContext>>> loadCommands() throws CLIInitException{
+		Map<String, Class<? extends Command<? extends CLIContext>>> commands =
+			new HashMap<String, Class<? extends Command<? extends CLIContext>>>();
 		
 		ClassPathScanningCandidateComponentProvider scanner =
 			new ClassPathScanningCandidateComponentProvider(false);
 		scanner.addIncludeFilter(new AnnotationTypeFilter(CLICommand.class));
 		
-		loadCommandsFromBasePackage(commands, getCommandBasePackage(), scanner);
+		findCommandsFromBasePackage(commands, getCommandBasePackage(), scanner);
 		if (commands.isEmpty()) {
 			throw new CLIInitException("No commands could be loaded from package ["+getCommandBasePackage()+"].");
 		}
 		
 		// Optionally load default commands.
 		if (loadDefaultCommands()) {
-			loadCommandsFromBasePackage(commands, DEFAULT_COMMANDS_PACKAGE, scanner);
+			findCommandsFromBasePackage(commands, DEFAULT_COMMANDS_PACKAGE, scanner);
 		}
 		
 		return commands;
 	}
 	
-	private void loadCommandsFromBasePackage(Map<String, Command<? extends CLIContext>> out,
+	private void findCommandsFromBasePackage(Map<String, Class<? extends Command<? extends CLIContext>>> out,
 			String basePackage, ClassPathScanningCandidateComponentProvider scanner) throws CLIInitException {
+		
 		Set<BeanDefinition> commandBeans =
 			scanner.findCandidateComponents(basePackage);
 		
@@ -168,26 +246,25 @@ public abstract class CommandLineApplication<T extends CLIContext> {
 			BeanDefinition def = it.next();
 			String commandClassName = def.getBeanClassName();
 			try {
-				Class<?> commandClass = Class.forName(commandClassName);
+				@SuppressWarnings("unchecked")
+				Class<? extends Command<? extends CLIContext>> commandClass =
+					(Class<? extends Command<? extends CLIContext>>) Class.forName(commandClassName);
+				
 				if (!Command.class.isAssignableFrom(commandClass)) {
 					Console.severe("Command class ["+commandClassName+"] is not of type Command.");
+					throw new CLIInitException("Command class ["+commandClassName+"] is not of type Command.");
 				}
 				
-				@SuppressWarnings("unchecked")
-				Command<? extends CLIContext> command = (Command<? extends CLIContext>)commandClass.newInstance();
-				CLICommand annotation = command.getClass().getAnnotation(CLICommand.class);
+				CLICommand annotation = commandClass.getAnnotation(CLICommand.class);
 				
-				out.put(annotation.name().toLowerCase(), command);
+				out.put(annotation.name().toLowerCase(), commandClass);
 				Console.info("Loaded command ["+annotation.name()+"].");
 			}
 			catch (ClassNotFoundException e) {
 				throw new CLIInitException("Unable to find command class ["+commandClassName+"].");
 			}
-			catch (InstantiationException e) {
-				throw new CLIInitException("Unable to create command class ["+commandClassName+"].");
-			}
-			catch (IllegalAccessException e) {
-				throw new CLIInitException("Unable to access command class ["+commandClassName+"].");
+			catch (Exception e) {
+				throw new CLIInitException("Unable to load command class ["+commandClassName+"]: " + e.getMessage());
 			}
 		}
 	}
@@ -208,8 +285,16 @@ public abstract class CommandLineApplication<T extends CLIContext> {
 	 * Return the list of commands known to this application.
 	 * @return The list of commands known to this application.
 	 */
-	public Set<String> getCommands() {
+	public Set<String> getCommandNames() {
 		return _commands.keySet();
+	}
+	
+	/**
+	 * Return the map of command names to their respective classes.
+	 * @return The map of command names to their respective classes.
+	 */
+	public Map<String, Class<? extends Command<? extends CLIContext>>> getCommands() {
+		return _commands;
 	}
 	
 	/**

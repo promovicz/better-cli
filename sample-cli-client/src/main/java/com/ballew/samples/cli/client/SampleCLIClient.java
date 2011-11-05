@@ -2,15 +2,20 @@ package com.ballew.samples.cli.client;
 
 import com.ballew.tools.cli.api.CLIContext;
 import com.ballew.tools.cli.api.CommandLineApplication;
-import com.ballew.tools.cli.api.CommandLineArguments;
 import com.ballew.tools.cli.api.annotations.CLIEntry;
 import com.ballew.tools.cli.api.exceptions.CLIInitException;
 
+/**
+ * A sample CLI client. Notice that it is annotated with CLIEntry, designating it as
+ * the CommandLineApplication to use.
+ * @author Sean
+ *
+ */
 @CLIEntry
 public class SampleCLIClient extends CommandLineApplication<SampleCLIContext> {
 
-	public SampleCLIClient(CommandLineArguments startupArgs) throws CLIInitException {
-		super(startupArgs);
+	public SampleCLIClient() throws CLIInitException {
+		super();
 	}
 
 	@Override

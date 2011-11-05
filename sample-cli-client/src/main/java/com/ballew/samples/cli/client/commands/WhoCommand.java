@@ -2,7 +2,6 @@ package com.ballew.samples.cli.client.commands;
 
 import com.ballew.samples.cli.client.SampleCLIContext;
 import com.ballew.tools.cli.api.Command;
-import com.ballew.tools.cli.api.CommandLineArguments;
 import com.ballew.tools.cli.api.CommandResult;
 import com.ballew.tools.cli.api.annotations.CLICommand;
 import com.ballew.tools.cli.api.console.Console;
@@ -12,11 +11,11 @@ import com.ballew.tools.cli.api.console.Console;
  * @author Sean
  *
  */
-@CLICommand(name="who")
+@CLICommand(name="who", description="Prints the username of the logged in user.")
 public class WhoCommand extends Command<SampleCLIContext> {
 
 	@Override
-	public CommandResult innerExecute(SampleCLIContext context, CommandLineArguments args) {
+	public CommandResult innerExecute(SampleCLIContext context) {
 		Console.info("Username of logged in user: ["+context.getLoggedInUser()+"].");
 		return CommandResult.OK;
 	}

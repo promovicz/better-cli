@@ -22,4 +22,10 @@ public @interface CLICommand {
 	 * @return The command name.
 	 */
 	String name();
+	
+	/**
+	 * Get the description of the command. Optional.
+	 * @return The command description.
+	 */
+	String description() default "";
 }
