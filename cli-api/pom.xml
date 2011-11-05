@@ -6,6 +6,11 @@
 	<artifactId>cli-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Command Line Interface API</name>
+	
+	<scm>
+		<connection>scm:svn:http://java-cli-api.googlecode.com/svn/trunk/</connection>
+		<developerConnection>scm:svn:https://java-cli-api.googlecode.com/svn/trunk/</developerConnection>
+	</scm>
 
 	<build>
 		<plugins>

@@ -5,6 +5,11 @@
 	<artifactId>sample-cli-client</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Sample CLI Client</name>
+	
+	<scm>
+		<connection>scm:svn:http://java-cli-api.googlecode.com/svn/trunk/</connection>
+		<developerConnection>scm:svn:https://java-cli-api.googlecode.com/svn/trunk/</developerConnection>
+	</scm>
 
 	<build>
 		<plugins>

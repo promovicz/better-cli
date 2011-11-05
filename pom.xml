@@ -9,6 +9,11 @@
 	<name>Command Line Interface API Modules</name>
 	<packaging>pom</packaging>
 
+	<scm>
+		<connection>scm:svn:http://java-cli-api.googlecode.com/svn/trunk/</connection>
+		<developerConnection>scm:svn:https://java-cli-api.googlecode.com/svn/trunk/</developerConnection>
+	</scm>
+
 	<modules>
 		<module>cli-api</module>
 		<module>sample-cli-client</module>
