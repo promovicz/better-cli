@@ -10,7 +10,7 @@ import com.beust.jcommander.Parameter;
 
 /**
  * Add a user to the datastore.
- * Usage: -f=blitzcrank -l=maokai -a=1337
+ * Usage: adduser -f blitzcrank -l maokai -a 1337
  * @author Sean
  *
  */

@@ -10,7 +10,7 @@ import com.beust.jcommander.Parameter;
 
 /**
  * Lookup a user in the user datastore.
- * Sample usage: -f=teemo -l=corki
+ * Sample usage: getuser -f teemo -l corki
  * @author Sean
  *
  */
