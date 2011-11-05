@@ -38,6 +38,7 @@ public class SetLogLevelCommand extends Command<CLIContext> {
 			return CommandResult.BAD_ARGS;
 		}
 		Console.setLevel(level);
+		Console.info("Logging level set to ["+level.name()+"].");
 		return CommandResult.OK;
 	}
 
