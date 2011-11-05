@@ -2,12 +2,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.ballew.samples.cli</groupId>
 	<artifactId>sample-cli-client</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<name>Sample CLI Client</name>
 	
 	<scm>
-		<connection>scm:svn:http://java-cli-api.googlecode.com/svn/tags/cli-0.0.1</connection>
-		<developerConnection>scm:svn:https://java-cli-api.googlecode.com/svn/tags/cli-0.0.1</developerConnection>
+		<connection>scm:svn:http://java-cli-api.googlecode.com/svn/trunk/</connection>
+		<developerConnection>scm:svn:https://java-cli-api.googlecode.com/svn/trunk/</developerConnection>
 	</scm>
 
 	<build>
@@ -51,7 +51,7 @@
 		<dependency>
 			<groupId>com.ballew.tools.cli</groupId>
 			<artifactId>cli-api</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
 
 		<!-- Test Dependencies -->
