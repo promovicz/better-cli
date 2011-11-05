@@ -139,6 +139,7 @@ public abstract class CommandLineApplication<T extends CLIContext> {
 		}
 		catch (ParameterException e) {
 			Console.error("Arguments cannot be parsed: " + e.getMessage());
+			command.usage();
 			return;
 		}
 		catch (ArrayIndexOutOfBoundsException e) {
@@ -149,6 +150,7 @@ public abstract class CommandLineApplication<T extends CLIContext> {
 			 * For now, we'll just catch this and print the following message.
 			 */
 			Console.error("Error parsing arguments: Did you specify a value after providing an option?");
+			command.usage();
 			return;
 		}
 		catch (Exception e) {
