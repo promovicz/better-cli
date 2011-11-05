@@ -2,7 +2,7 @@ package com.ballew.tools.cli.api;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
@@ -10,18 +10,17 @@ import java.util.Set;
 import jline.ConsoleReader;
 import jline.SimpleCompletor;
 
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
-import org.springframework.core.type.filter.AnnotationTypeFilter;
-
 import com.ballew.tools.cli.api.CommandResult.CommandResultType;
 import com.ballew.tools.cli.api.annotations.CLICommand;
 import com.ballew.tools.cli.api.console.Console;
 import com.ballew.tools.cli.api.console.Console.ConsoleLevel;
 import com.ballew.tools.cli.api.exceptions.CLIInitException;
 import com.ballew.tools.cli.api.exceptions.CommandInitException;
+import com.ballew.tools.cli.api.utils.CLIAnnotationDiscovereryListener;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
+import com.impetus.annovention.ClasspathDiscoverer;
+import com.impetus.annovention.Discoverer;
 
 /**
  * The CommandLineApplication is the base class for any application wanting
@@ -32,9 +31,6 @@ import com.beust.jcommander.ParameterException;
  *
  */
 public abstract class CommandLineApplication<T extends CLIContext> {
-	
-	/** The package in which the default commands reside. **/
-	private static final String DEFAULT_COMMANDS_PACKAGE = "com.ballew.tools.cli.api.defaultcommands";
 	
 	/** The property key to define the default log level. **/
 	private static final String DEFAULT_LOG_LEVEL_KEY = "default_log_level";
@@ -216,37 +212,26 @@ public abstract class CommandLineApplication<T extends CLIContext> {
 		Map<String, Class<? extends Command<? extends CLIContext>>> commands =
 			new HashMap<String, Class<? extends Command<? extends CLIContext>>>();
 		
-		ClassPathScanningCandidateComponentProvider scanner =
-			new ClassPathScanningCandidateComponentProvider(false);
-		scanner.addIncludeFilter(new AnnotationTypeFilter(CLICommand.class));
+		Discoverer discoverer = new ClasspathDiscoverer();
+		CLIAnnotationDiscovereryListener discoveryListener =
+			new CLIAnnotationDiscovereryListener(new String[] {CLICommand.class.getName()});
+		discoverer.addAnnotationListener(discoveryListener);
+		discoverer.discover();
 		
-		findCommandsFromBasePackage(commands, getCommandBasePackage(), scanner);
+		loadCommands(commands, discoveryListener.getDiscoveredClasses());
+		
 		if (commands.isEmpty()) {
-			throw new CLIInitException("No commands could be loaded from package ["+getCommandBasePackage()+"].");
-		}
-		
-		// Optionally load default commands.
-		if (loadDefaultCommands()) {
-			findCommandsFromBasePackage(commands, DEFAULT_COMMANDS_PACKAGE, scanner);
+			throw new CLIInitException("No commands could be loaded.");
 		}
 		
 		return commands;
 	}
 	
-	private void findCommandsFromBasePackage(Map<String, Class<? extends Command<? extends CLIContext>>> out,
-			String basePackage, ClassPathScanningCandidateComponentProvider scanner) throws CLIInitException {
+	private void loadCommands(Map<String, Class<? extends Command<? extends CLIContext>>> out,
+			List<String> commandClasses) throws CLIInitException {
 		
-		Set<BeanDefinition> commandBeans =
-			scanner.findCandidateComponents(basePackage);
-		
-		if (commandBeans == null || commandBeans.isEmpty()) {
-			return;
-		}
-		
-		Iterator<BeanDefinition> it = commandBeans.iterator();
-		while (it.hasNext()) {
-			BeanDefinition def = it.next();
-			String commandClassName = def.getBeanClassName();
+		for (String commandClassName : commandClasses) {
+
 			try {
 				@SuppressWarnings("unchecked")
 				Class<? extends Command<? extends CLIContext>> commandClass =
@@ -298,21 +283,6 @@ public abstract class CommandLineApplication<T extends CLIContext> {
 	public Map<String, Class<? extends Command<? extends CLIContext>>> getCommands() {
 		return _commands;
 	}
-	
-	/**
-	 * Decide whether or not to load the default commands.
-	 * By default, this returns true.
-	 * @return Whether or not the defualt commands should load.
-	 */
-	protected boolean loadDefaultCommands() {
-		return true;
-	}
-	
-	/**
-	 * Get the base package for where to load commands from.
-	 * @return The base package for where to load commands from.
-	 */
-	protected abstract String getCommandBasePackage();
 	
 	/**
 	 * Called when the user has cleanly exited the application.

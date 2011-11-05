@@ -19,11 +19,6 @@ public class SampleCLIClient extends CommandLineApplication<SampleCLIContext> {
 	}
 
 	@Override
-	protected String getCommandBasePackage() {
-		return "com.ballew.samples.cli.client.commands";
-	}
-
-	@Override
 	protected void shutdown() {
 		System.out.println("Shutting down SampleClient.");
 	}
