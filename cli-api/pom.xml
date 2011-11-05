@@ -3,7 +3,7 @@
 
 	<groupId>com.ballew.tools.cli</groupId>
 	<artifactId>cli-api</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.1-SNAPSHOT</version>
 	<name>Command Line Interface API</name>
 	
 	<scm>
