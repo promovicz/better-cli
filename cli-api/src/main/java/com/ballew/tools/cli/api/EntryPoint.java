@@ -32,7 +32,7 @@ public class EntryPoint {
 		
 		String cliEntryClassName = discoveryListener.getDiscoveredClasses().get(0);
 
-		Console.info("Loading CLIEntry ["+cliEntryClassName+"].");
+		Console.superFine("Loading CLIEntry ["+cliEntryClassName+"].");
 		
 		try {
 			Class<?> cliEntryClass = Class.forName(cliEntryClassName);

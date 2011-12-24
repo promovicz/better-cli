@@ -245,7 +245,7 @@ public abstract class CommandLineApplication<T extends CLIContext> {
 				CLICommand annotation = commandClass.getAnnotation(CLICommand.class);
 				
 				out.put(annotation.name().toLowerCase(), commandClass);
-				Console.info("Loaded command ["+annotation.name()+"].");
+				Console.superFine("Loaded command ["+annotation.name()+"].");
 			}
 			catch (ClassNotFoundException e) {
 				throw new CLIInitException("Unable to find command class ["+commandClassName+"].");
