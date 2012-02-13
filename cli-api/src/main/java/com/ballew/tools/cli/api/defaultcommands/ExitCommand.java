@@ -11,7 +11,7 @@ import com.ballew.tools.cli.api.annotations.CLICommand;
  * @author Sean
  *
  */
-@CLICommand(name="exit", description="Exists the application.")
+@CLICommand(name="exit", description="Exits the application.")
 public class ExitCommand extends Command<CLIContext> {
 
 	@Override
