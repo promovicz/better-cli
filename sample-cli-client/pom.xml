@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.ballew.samples.cli</groupId>
+	<groupId>ballew.samples.cli</groupId>
 	<artifactId>sample-cli-client</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
 	<name>Sample CLI Client</name>
@@ -30,7 +30,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>com.ballew.tools.cli.api.EntryPoint</mainClass>
+							<mainClass>ballew.tools.cli.api.EntryPoint</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -49,7 +49,7 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.ballew.tools.cli</groupId>
+			<groupId>ballew.tools.cli</groupId>
 			<artifactId>cli-api</artifactId>
 			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
