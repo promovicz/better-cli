@@ -50,6 +50,11 @@ public class SampleCLIContext extends CLIContext {
 		return (UserDatastore)this.getObject(USER_DATASTORE);
 	}
 	
+	@Override
+	protected String getEmbeddedPropertiesFilename() {
+		return "/embedded_sample_client.properties";
+	}
+	
 	/**
 	 * Specify the property file used by this context to load
 	 * initial properties from. This property file should sit outside of

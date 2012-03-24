@@ -2,6 +2,8 @@ package net.dharwin.common.tools.cli.api;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -33,7 +35,7 @@ public class CLIContext {
 	public CLIContext(CommandLineApplication<? extends CLIContext> app) {
 		_properties = new HashMap<String, Object>();
 		_app = app;
-		loadProperties(getEmbeddedPropertiesFile());
+		loadProperties(getEmbeddedPropertiesFilename());
 		loadProperties(getExternalPropertiesFile());
 	}
 	
@@ -46,6 +48,14 @@ public class CLIContext {
 	}
 	
 	/**
+	 * Load properties from a resource stream.
+	 * @param propFileName The resource name.
+	 */
+	private void loadProperties(String propFileName) {
+		loadProperties(getClass().getResourceAsStream(propFileName), propFileName);
+	}
+	
+	/**
 	 * Load properties from a file.
 	 * @param propFile
 	 */
@@ -53,9 +63,20 @@ public class CLIContext {
 		if (propFile == null) {
 			return;
 		}
-		FileInputStream stream = null;
 		try {
-			stream = new FileInputStream(propFile);
+			loadProperties(new FileInputStream(propFile), propFile.getAbsolutePath());
+		}
+		catch (FileNotFoundException e) {
+			Console.warn("Unable to find properties file ["+propFile.getAbsolutePath()+"].");
+		}
+	}
+	
+	private void loadProperties(InputStream stream, String path) {
+		if (stream == null) {
+			return;
+		}
+		
+		try {
 			Properties props = new Properties();
 			props.load(stream);
 			
@@ -66,7 +87,7 @@ public class CLIContext {
 			}
 		}
 		catch (Exception e) {
-			Console.warn("Unable to load properties file ["+propFile.getAbsolutePath()+"].");
+			Console.warn("Unable to load properties file ["+path+"].");
 		}
 		finally {
 			if (stream != null) {
@@ -74,7 +95,7 @@ public class CLIContext {
 					stream.close();
 				}
 				catch (Exception e) {
-					Console.warn("Unable to close properties file ["+propFile.getAbsolutePath()+"].");
+					Console.warn("Unable to close properties file ["+path+"].");
 				}
 			}
 		}
@@ -84,7 +105,7 @@ public class CLIContext {
 	 * Get the embedded property file. If none should be used, specify null.
 	 * @return
 	 */
-	protected File getEmbeddedPropertiesFile() {
+	protected String getEmbeddedPropertiesFilename() {
 		return null;
 	}
 	
