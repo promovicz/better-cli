@@ -1,8 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>ballew.samples.cli</groupId>
+	<groupId>net.dharwin.common.tools.cli</groupId>
 	<artifactId>sample-cli-client</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>1.0-SNAPSHOT</version>
 	<name>Sample CLI Client</name>
 	
 	<scm>
@@ -30,7 +31,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>ballew.tools.cli.api.EntryPoint</mainClass>
+							<mainClass>net.dharwin.common.tools.cli.api.EntryPoint</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -49,9 +50,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>ballew.tools.cli</groupId>
+			<groupId>net.dharwin.common.tools.cli</groupId>
 			<artifactId>cli-api</artifactId>
-			<version>0.0.2-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<!-- Test Dependencies -->
