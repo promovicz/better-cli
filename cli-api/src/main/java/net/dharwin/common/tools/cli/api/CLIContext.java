@@ -71,6 +71,12 @@ public class CLIContext {
 		}
 	}
 	
+	/**
+	 * Loads properties from the given stream.
+	 * This will close the stream.
+	 * @param stream The stream to load from.
+	 * @param path The path represented by the stream.
+	 */
 	private void loadProperties(InputStream stream, String path) {
 		if (stream == null) {
 			return;
