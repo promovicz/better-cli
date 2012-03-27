@@ -3,7 +3,7 @@
 
 	<groupId>net.dharwin.common.tools.cli</groupId>
 	<artifactId>cli</artifactId>
-	<version>1.0</version>
+	<version>1.1-SNAPSHOT</version>
 	<name>Command Line Interface API Modules</name>
 	<packaging>pom</packaging>
 
@@ -25,9 +25,9 @@
 	<url>http://code.google.com/p/java-cli-api/</url>
 
 	<scm>
-		<url>http://java-cli-api.googlecode.com/svn/tags/cli-1.0</url>
-		<connection>scm:svn:http://java-cli-api.googlecode.com/svn/tags/cli-1.0</connection>
-		<developerConnection>scm:svn:https://java-cli-api.googlecode.com/svn/tags/cli-1.0</developerConnection>
+		<url>http://java-cli-api.googlecode.com/svn/trunk/</url>
+		<connection>scm:svn:http://java-cli-api.googlecode.com/svn/trunk/</connection>
+		<developerConnection>scm:svn:https://java-cli-api.googlecode.com/svn/trunk/</developerConnection>
 	</scm>
 
 	<developers>
