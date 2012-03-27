@@ -2,11 +2,15 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>net.dharwin.common.tools.cli</groupId>
 	<artifactId>sample-cli-client</artifactId>
-	<version>1.0-SNAPSHOT</version>
 	<name>Sample CLI Client</name>
 	<packaging>jar</packaging>
+
+	<parent>
+		<groupId>net.dharwin.common.tools.cli</groupId>
+		<artifactId>cli</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
 
 	<licenses>
 		<license>
@@ -64,7 +68,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
