@@ -52,7 +52,9 @@ public class CLIContext {
 	 * @param propFileName The resource name.
 	 */
 	private void loadProperties(String propFileName) {
-		loadProperties(getClass().getResourceAsStream(propFileName), propFileName);
+		if (propFileName != null) {
+			loadProperties(getClass().getResourceAsStream(propFileName), propFileName);
+		}
 	}
 	
 	/**
