@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>cli-api</artifactId>
-	<name>Command Line Interface API</name>
+	<artifactId>better-cli-api</artifactId>
+	<name>Better CLI API</name>
 	<packaging>jar</packaging>
 
 	<parent>
-		<groupId>net.dharwin.common.tools.cli</groupId>
-		<artifactId>cli</artifactId>
-		<version>1.1-SNAPSHOT</version>
+		<groupId>better</groupId>
+		<artifactId>better-cli</artifactId>
+		<version>0.1-SNAPSHOT</version>
 	</parent>
 
 	<licenses>
@@ -18,56 +18,8 @@
 		</license>
 	</licenses>
 
-	<url>http://code.google.com/p/java-cli-api/</url>
-
-	<scm>
-		<url>http://java-cli-api.googlecode.com/svn/trunk/</url>
-		<connection>scm:svn:http://java-cli-api.googlecode.com/svn/trunk/</connection>
-		<developerConnection>scm:svn:https://java-cli-api.googlecode.com/svn/trunk/</developerConnection>
-	</scm>
-
-	<developers>
-		<developer>
-			<name>Sean Ballew</name>
-			<id>sballew</id>
-			<email>sballew7@gmail.com</email>
-			<timezone>-8</timezone>
-			<roles>
-				<role>owner</role>
-				<role>developer</role>
-			</roles>
-		</developer>
-	</developers>
-
 	<build>
 		<plugins>
-			<!-- Attach sources -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<!-- Attach Javadocs -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
