@@ -15,8 +15,8 @@
 	</licenses>
 
 	<modules>
-		<module>cli-api</module>
-		<module>sample-cli-client</module>
+		<module>api</module>
+		<module>sample</module>
 	</modules>
 
 </project>
