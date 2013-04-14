@@ -38,7 +38,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>net.dharwin.common.tools.cli.api.EntryPoint</mainClass>
+							<mainClass>better.cli.EntryPoint</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
