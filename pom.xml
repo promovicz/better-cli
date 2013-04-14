@@ -14,6 +14,12 @@
 		</license>
 	</licenses>
 
+    <properties>
+        <java.version>1.6</java.version>
+        <jline.version>0.9.94</jline.version>
+        <jcommander.version>1.30</jcommander.version>
+    </properties>
+
 	<modules>
 		<module>api</module>
 		<module>sample</module>
