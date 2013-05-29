@@ -26,7 +26,7 @@ public class PrintUtils {
         // Generate a format string for each column
         String[] formats = new String[lengths.length];
         for (int i = 0; i < lengths.length; i++) {
-            formats[i] = "%" + lengths[i] + "s" + (i + 1 == lengths.length ? "\n" : " ");
+            formats[i] = "%-" + lengths[i] + "s" + (i + 1 == lengths.length ? "\n" : " ");
         }
 
         // Print 'em out
