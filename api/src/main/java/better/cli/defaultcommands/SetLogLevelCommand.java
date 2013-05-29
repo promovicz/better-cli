@@ -14,7 +14,7 @@ import com.beust.jcommander.Parameter;
  * @author Sean
  *
  */
-@CLICommand(name="loglevel", description="Sets the logging level threshold.")
+@CLICommand(name="conlevel", description="Sets the logging level threshold.")
 public class SetLogLevelCommand extends Command<CLIContext> {
 	
 	@Parameter(names={"-l", "--level"}, description="The log level to set the threshold to.", required=true)
