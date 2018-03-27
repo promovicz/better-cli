@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 
-@CLICommand(name = "loglist", description = "List loggers")
+@CLICommand(name = "log-list", description = "List log4j loggers")
 public class LogList extends Command<CLIContext> {
     @Override
     protected CommandResult innerExecute(CLIContext context) {

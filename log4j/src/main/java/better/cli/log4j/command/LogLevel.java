@@ -10,11 +10,11 @@ import org.apache.log4j.Logger;
 
 import java.util.List;
 
-@CLICommand(name = "loglevel", description = "Set the level of a logger")
+@CLICommand(name = "log-level", description = "Set log4j log level")
 public class LogLevel extends Command<CLIContext> {
 
-    @Parameter(description = "Pairs of logger and level or single level for root logger")
-    List<String> pLogger;
+    @Parameter(description = "([logger] [level])... or [root-level]")
+    private List<String> pLogger;
 
     @Override
     protected CommandResult innerExecute(CLIContext context) {
