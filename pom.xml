@@ -15,7 +15,7 @@
 	</licenses>
 
     <properties>
-      <java.version>1.6</java.version>
+      <java.version>1.8</java.version>
 
       <annovention.version>1.0</annovention.version>
       <jline.version>0.9.94</jline.version>
