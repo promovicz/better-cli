@@ -27,6 +27,7 @@
       <maven-compiler.version>3.7.0</maven-compiler.version>
       <maven-assembly.version>3.1.0</maven-assembly.version>
       <maven-resources.version>3.0.2</maven-resources.version>
+      <maven-javadoc.version>3.0.0</maven-javadoc.version>
     </properties>
 
 	<modules>
@@ -34,5 +35,24 @@
         <module>log4j</module>
         <module>sample</module>
 	</modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc.version}</version>
+                <executions>
+                    <execution>
+                        <id>aggregate</id>
+                        <goals>
+                            <goal>aggregate</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
